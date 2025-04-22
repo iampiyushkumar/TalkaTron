@@ -29,7 +29,7 @@ function Signup() {
     };
     // console.log(userInfo);
     await axios
-      .post("http://localhost:5002/api/user/signup", userInfo)
+      .post("talkatron-production.up.railway.app", userInfo)
       .then((response) => {
         if (response.data) {
           toast.success("Signup successful");
