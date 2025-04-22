@@ -3,59 +3,48 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
 import userRoute from './routes/user.route.js';
-import path from "path";
+import messageRoute from './routes/message.route.js';
 import cors from 'cors';
-import messageRoute from "./routes/message.route.js";
-import {app,server} from './SocketIO/server.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { app, server } from './SocketIO/server.js';
 
-
-
-
-
+// Environment
 dotenv.config();
+
+// Middleware
 app.use(express.json());
-
-
-
-
 app.use(cookieParser());
+
 app.use(cors({
-    origin:"https://talka-tron.vercel.app/login",  // Allow frontend
-    methods: ["GET", "POST"],
-    credentials: true
+    origin: "https://talka-tron.vercel.app",
+    credentials: true,
 }));
 
-const PORT=process.env.PORT||5000;
-const URI=process.env.MONGODB_URI;
-try{
-   mongoose.connect(URI)
-   console.log("MongoDB connected");
-}catch(error){
-    console.log('Error:',error);
+// MongoDB Connection
+const URI = process.env.MONGODB_URI;
+mongoose.connect(URI)
+    .then(() => console.log("MongoDB connected"))
+    .catch((err) => console.error("MongoDB error:", err));
+
+// Routes
+app.use("/api/user", userRoute);
+app.use("/api/message", messageRoute);
+
+// Deployment static file serving
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.join(__dirname, "../Frontend/dist")));
+    app.get("*", (req, res) => {
+        res.sendFile(path.join(__dirname, "../Frontend/dist", "index.html"));
+    });
 }
 
-
-app.use("/api/user",userRoute);
-
-app.use("/api/message",messageRoute);
-
-//------------------Code for deployment lets write--------------
-
-
-if(process.env.NODE_ENV==='production'){
-     const dirPath=path.resolve();
-     app.use(express.static("/Frontend/dist"));
-        app.get("*",(req,res)=>{
-            res.sendFile(path.resolve(dirPath,"./Frontend/dist","index.html"));
-        });
-}
-
-
-
-
-
-
-
-server.listen(PORT,()=>{
-    console.log(`Server is running on port ${PORT}`);
+// Server Start
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
+
