@@ -20,7 +20,7 @@ app.use(express.json());
 
 app.use(cookieParser());
 app.use(cors({
-    origin:"http://localhost:3001",  // Allow frontend
+    origin:"https://talka-tron.vercel.app/login",  // Allow frontend
     methods: ["GET", "POST"],
     credentials: true
 }));
