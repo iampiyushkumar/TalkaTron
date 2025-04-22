@@ -29,7 +29,7 @@ function Signup() {
     };
     // console.log(userInfo);
     await axios
-      .post("talkatron-production.up.railway.app", userInfo)
+      .post("talkatron-production.up.railway.app/api/user/signup", userInfo)
       .then((response) => {
         if (response.data) {
           toast.success("Signup successful");
